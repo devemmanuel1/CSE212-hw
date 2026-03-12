@@ -1,10 +1,13 @@
-﻿public class PriorityQueue
+﻿﻿using System;
+using System.Collections.Generic;
+
+public class PriorityQueue
 {
     private List<PriorityItem> _queue = new();
 
     /// <summary>
-    /// Add a new value to the queue with an associated priority.  The
-    /// node is always added to the back of the queue regardless of 
+    /// Add a new value to the queue with an associated priority. The
+    /// node is always added to the back of the queue regardless of
     /// the priority.
     /// </summary>
     /// <param name="value">The value</param>
@@ -15,28 +18,61 @@
         _queue.Add(newNode);
     }
 
+    /// <summary>
+    /// Get the number of items currently in the queue.
+    /// This property is essential for checking the queue's size in tests.
+    /// </summary>
+    public int Length => _queue.Count; // This line was added/uncommented
+
+    /// <summary>
+    /// Remove the item with the highest priority and return its value.
+    /// If there are more than one item with the highest priority,
+    /// then the item closest to the front of the queue will be removed and its value returned.
+    /// Throws InvalidOperationException if the queue is empty.
+    /// </summary>
     public string Dequeue()
     {
+        // Requirement: "If the queue is empty, then an error exception shall be thrown."
         if (_queue.Count == 0) // Verify the queue is not empty
         {
             throw new InvalidOperationException("The queue is empty.");
         }
 
         // Find the index of the item with the highest priority to remove
-        var highPriorityIndex = 0;
-        for (int index = 1; index < _queue.Count - 1; index++)
+        // Initialize with the first item's priority and index
+        // This implicitly makes the first item the "highest" until a truly higher one is found.
+        int highPriorityIndex = 0;
+        int highestPriority = _queue[0].Priority;
+
+        // Iterate through the rest of the list to find the item with the highest priority.
+        // We start from index 1 because index 0 is our initial candidate.
+        // The loop condition `index < _queue.Count` ensures all elements are checked.
+        for (int index = 1; index < _queue.Count; index++)
         {
-            if (_queue[index].Priority >= _queue[highPriorityIndex].Priority)
+            // Requirement: "The Dequeue function shall remove the item with the highest priority and return its value."
+            // Requirement: "If there are more than one item with the highest priority,
+            // then the item closest to the front of the queue will be removed and its value returned."
+            //
+            // If the current item's priority is GREATER THAN the current highestPriority found so far,
+            // then it becomes the new highest. This ensures we always find the absolute highest.
+            if (_queue[index].Priority > highestPriority)
+            {
+                highestPriority = _queue[index].Priority;
                 highPriorityIndex = index;
+            }
+            // If the current item's priority is EQUAL to the current highestPriority,
+            // we DO NOT update highPriorityIndex. This implicitly ensures FIFO tie-breaking,
+            // as the item found first (with a lower 'highPriorityIndex') will be kept.
         }
 
-        // Remove and return the item with the highest priority
-        var value = _queue[highPriorityIndex].Value;
-        return value;
+        // Remove the item with the highest priority from the list
+        // and store its value before removal.
+        var valueToReturn = _queue[highPriorityIndex].Value;
+        _queue.RemoveAt(highPriorityIndex); // This is the crucial step to actually remove it
+
+        return valueToReturn;
     }
 
-    // DO NOT MODIFY THE CODE IN THIS METHOD
-    // The graders rely on this method to check if you fixed all the bugs, so changes to it will cause you to lose points.
     public override string ToString()
     {
         return $"[{string.Join(", ", _queue)}]";
@@ -45,7 +81,7 @@
 
 internal class PriorityItem
 {
-    internal string Value { get; set; }
+    internal string Value { get; set; } // Property changed from Data to Value based on your provided code
     internal int Priority { get; set; }
 
     internal PriorityItem(string value, int priority)
@@ -54,8 +90,6 @@ internal class PriorityItem
         Priority = priority;
     }
 
-    // DO NOT MODIFY THE CODE IN THIS METHOD
-    // The graders rely on this method to check if you fixed all the bugs, so changes to it will cause you to lose points.
     public override string ToString()
     {
         return $"{Value} (Pri:{Priority})";
