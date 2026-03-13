@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
+
 /// <summary>
 /// A basic implementation of a Queue
 /// </summary>
-public class PersonQueue
+public class TakingTurnsQueue
 {
     private readonly List<Person> _queue = new();
 
