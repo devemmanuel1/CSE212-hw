@@ -11,7 +11,7 @@ public class TakingTurnsQueue
     public int Length => _queue.Count;
 
     /// <summary>
-    /// Add a person to the queue
+    /// Adding a person to the queue
     /// </summary>
     /// <param name="person">The person to add</param>
     public void Enqueue(Person person)
